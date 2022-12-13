@@ -1,6 +1,8 @@
-﻿namespace PluginA;
+﻿using Microsoft.Extensions.Logging;
+
+namespace PluginA;
 
 public interface IFreebetService
 {
-    void Print(string text);
+    void Print(string text, ILogger logger);
 }

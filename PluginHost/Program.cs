@@ -7,6 +7,7 @@ using PluginHost.Loader;
 using SharedLibrary;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.ConfigureSerilog();
 
 // Add services to the container.
 var location = new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName!;
@@ -14,8 +15,17 @@ var location = new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryN
 AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) =>
 {
     var fullyQualifiedPath = Path.Combine(location, $"{assemblyName.Name}.dll");
+    try
+    {
+        var something = assemblyLoadContext.LoadFromAssemblyPath(fullyQualifiedPath);
 
-    return assemblyLoadContext.LoadFromAssemblyPath(fullyQualifiedPath);
+        return something;
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
+        return null;
+    }    
 };
 
 builder.Services.AddControllers();
@@ -47,11 +57,11 @@ void InstallPlugin(string pluginPath, IConfiguration config)
     pluginRegistrant.Register(builder.Services, config); // create services the host doesn't know about
 
     // a plugin can contribute more than one class
-    foreach (var pluginType in pluginAssembly.GetTypes().Where(t => t.GetInterfaces().Any(i => i.Name == nameof(IPlugin))))
-    {
-        var pluginTypeCtor = pluginType.GetConstructors().Single(); // exactly one ctor per plugin class
-        var pluginTypeCtorParamInfos = pluginTypeCtor
-            .GetParameters()
-            .OrderBy(pi => pi.Position);
-    }
+    //foreach (var pluginType in pluginAssembly.GetTypes().Where(t => t.GetInterfaces().Any(i => i.Name == nameof(IPlugin))))
+    //{
+    //    var pluginTypeCtor = pluginType.GetConstructors().Single(); // exactly one ctor per plugin class
+    //    var pluginTypeCtorParamInfos = pluginTypeCtor
+    //        .GetParameters()
+    //        .OrderBy(pi => pi.Position);
+    //}
 }

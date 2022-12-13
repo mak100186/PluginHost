@@ -10,3 +10,5 @@
 /SharedLibrary/bin/Debug/net6.0
 /SharedLibrary/obj/Debug/net6.0
 /SharedLibrary/obj
+*.txt
+/.vs/ProjectEvaluation

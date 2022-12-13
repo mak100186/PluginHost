@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using SharedLibrary;
 
@@ -7,14 +8,17 @@ namespace PluginA;
 public class Freebet : IPlugin
 {
     private readonly IFreebetService _service;
-    public Freebet(IFreebetService service)
+    private readonly ILogger<Freebet> _logger;
+
+    public Freebet(IFreebetService service, ILogger<Freebet> logger)
     {
         this._service = service;
+        this._logger = logger;
     }
 
     public void DoSomething()
     {
-        this._service.Print("Freebet plugin");
+        this._service.Print("Freebet plugin", this._logger);
     }
 }
 
@@ -31,8 +35,8 @@ public class Registrant : IRegistrant
 
 public class FreebetService : IFreebetService
 {
-    public void Print(string text)
+    public void Print(string text, ILogger logger)
     {
-        Console.WriteLine(text);
+        logger.LogInformation(text);
     }
 }

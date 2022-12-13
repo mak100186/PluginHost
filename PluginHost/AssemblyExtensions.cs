@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 
+using Serilog;
+
 namespace PluginHost;
 
 public static class AssemblyExtensions
@@ -61,5 +63,13 @@ public static class AssemblyExtensions
     {
         return assy.GetExportedTypes().Any(t => t.FullName == typeName);
     }
-
+    public static IHostBuilder ConfigureSerilog(this IHostBuilder builder)
+    {
+        return builder.UseSerilog((ctx, conf) =>
+        {
+            conf.ReadFrom.Configuration(ctx.Configuration);
+            conf.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}{NewLine}");
+            conf.WriteTo.File(path: "log-.txt", outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}{NewLine}", rollingInterval: RollingInterval.Day);
+        });
+    }
 }
