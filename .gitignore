@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/PluginHost
+/PluginA/bin/Debug/net6.0
+/PluginA/obj
+/PluginHost/bin/Debug/net6.0
+/PluginHost/obj
+/SharedLibrary/bin/Debug/net6.0
+/SharedLibrary/obj/Debug/net6.0
+/SharedLibrary/obj

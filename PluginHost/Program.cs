@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 
 using PluginHost;
+using PluginHost.Loader;
 
 using SharedLibrary;
 
@@ -9,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var location = new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName!;
-
 
 AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) =>
 {
@@ -20,18 +20,18 @@ AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) =>
 
 builder.Services.AddControllers();
 
+builder.Services.AddSingleton<IPluginLoader, PluginLoader>();
+builder.Services.AddHostedService<LoaderBackgroundService>();
+
 InstallPlugin("C:\\Users\\muhkha\\source\\repos\\PluginHost\\PluginHost\\PluginA\\bin\\Debug\\net6.0\\PluginA.dll", builder.Configuration);
 
+
+//Start app
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
 app.MapControllers();
-
-using var scope = app.Services.CreateScope();
-scope.ServiceProvider.GetRequiredService<IPlugin>()?.DoSomething(); //this is the runner
 
 app.Run();
 
@@ -53,11 +53,5 @@ void InstallPlugin(string pluginPath, IConfiguration config)
         var pluginTypeCtorParamInfos = pluginTypeCtor
             .GetParameters()
             .OrderBy(pi => pi.Position);
-        //builder.Services.AddScoped<shared_types.IPluginMultiply>(sp =>
-        //{
-        //    var pluginCtorParamValues = pluginTypeCtorParamInfos.Select(p => sp.GetService(p.ParameterType)!) ?? new List<Type>();
-        //    var result = pluginAssembly.CreateInstance<shared_types.IPluginMultiply>(pluginType.FullName!, pluginCtorParamValues)!;
-        //    return result!;
-        //});
     }
 }
